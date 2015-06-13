@@ -53,7 +53,7 @@ class RubyRumble
         print_board
         move_characters(player, @players[index - 1])
         attack_characters(player, @players[index - 1])
-        sleep(0.3) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
+        sleep(0.2) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
       end
     end
 
