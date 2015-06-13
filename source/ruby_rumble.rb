@@ -11,16 +11,19 @@ class RubyRumble
     ranger = Ranger.new
     characters = [knight, mage, ranger].shuffle
 
-    @players_character = characters.pop
-    @enemy_character = characters.pop
-    @player_positions = [[@players_character, 0],
-                         [@enemy_character, @length - 1]]
+    @players = [{ character: characters.pop,
+                  position: 0,
+                  direction: 'left' },
+                { character: characters.pop,
+                  position: @length - 1,
+                  direction: 'right' }]
+    @players.shuffle!
   end
 
   def run
     reset_screen!
     welcome_screen
-    @player = gets.chomp
+    @player_name = gets.chomp
     welcome_player
     ready = gets.chomp.downcase
     rumble if ready == 'yes'
@@ -46,21 +49,20 @@ class RubyRumble
 
   def welcome_player
     puts ''
-    puts "Welcome #{@player}!"
+    puts "Welcome #{@player_name}!"
     puts ''
     puts 'Are you ready to rumble?'
   end
 
   def rumble
-    turn = 0
 
     until finished?
-      # players.each do |player|
-      print_board
-      move_characters(turn)
-      sleep(0.5) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
-      turn += 1
-      turn = 0 if turn == @player_positions.length
+      @players.each_with_index do |player, index|
+        print_board
+        move_characters(player, @players[index - 1])
+        attack_characters(player, @players[index - 1])
+        sleep(0.3) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
+      end
     end
 
     print_board
@@ -70,60 +72,49 @@ class RubyRumble
 
   def print_board
     reset_screen!
-    board = Array.new(@length - @player_positions.length) { ' ' }
+    board = Array.new(@length - @players.length) { ' ' }
 
-    @player_positions.each do |player|
-      board.insert player[1], player[0].appearance
+    @players.each do |player|
+      board.insert player[:position], player[:character].appearance
     end
 
+    puts 'Ruby Rumble!!!'
     puts '*' * @length
-    remaining_board = @length - @player.length - 'Enemy'.length
-    puts "#{@player}" + ' ' * remaining_board + 'Enemy'
+    remaining_board = @length - @player_name.length - 'Enemy'.length
+    puts "#{@player_name}" + ' ' * remaining_board + 'Enemy'
     puts ''
     puts board.join
   end
 
-  def move_characters(turn)
-    player = @player_positions[turn]
-    if turn == 0
-      player[1] += player[0].speed
-    else
-      player[1] -= player[0].speed
-    end
+  def move_characters(player, opponent)
 
-    if @player_positions[0][1] >= @player_positions[1][1]
-      @player_positions[0][1] = @player_positions[1][1] - 1
-      attack_characters(turn)
-    end
-
-    if @player_positions[1][1] <= @player_positions[0][1]
-      @player_positions[1][1] = @player_positions[0][1] + 1
-      attack_characters(turn)
+    case player[:direction]
+    when 'left'
+      player[:position] += player[:character].speed
+      player[:position] = opponent[:position] - 1 if player[:position] >= opponent[:position]
+    when 'right'
+      player[:position] -= player[:character].speed
+      player[:position] = opponent[:position] + 1 if player[:position] <= opponent[:position]
     end
   end
 
-  def attack_characters(turn)
-    if turn == 0
-      @player_positions[1][0].defense -= @player_positions[0][0].attack
-    else
-      @player_positions[0][0].defense -= @player_positions[1][0].attack
+  def attack_characters(player, opponent)
+
+    if (player[:position] - opponent[:position]).abs == 1
+      opponent[:character].defense -= player[:character].attack
     end
   end
 
   def finished?
     # returns true when one player's characters are all defeated
     # returns false otherwise
-    fin = @player_positions.map { |player| player[0].alive? }
-    fin.include? false
+    @players.map { |player| player[:character].alive? }.include? false
   end
 
   def winner
-    # returns the winner if there is one, nil otherwise
-    if @players_character.alive?
-      return @player
-    else
-      return 'Enemy'
-    end
+    # returns the name of the winning character
+    winner = @players.find { |player| player[:character].alive? }
+    winner[:character].class
   end
 
   def reset_screen!
