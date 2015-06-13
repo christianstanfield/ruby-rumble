@@ -61,7 +61,7 @@ class RubyRumble
         print_board
         move_characters(player, @players[index - 1])
         attack_characters(player, @players[index - 1])
-        sleep(0.3) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
+        sleep(0.2) # http://ruby-doc.org/core-2.2.2/Kernel.html#method-i-sleep
       end
     end
 
@@ -72,10 +72,10 @@ class RubyRumble
 
   def print_board
     reset_screen!
-    board = Array.new(@length - @players.length) { ' ' }
+    board = Array.new(@length) { ' ' }
 
     @players.each do |player|
-      board.insert player[:position], player[:character].appearance
+      board[player[:position]] = player[:character].appearance
     end
 
     puts 'Ruby Rumble!!!'
