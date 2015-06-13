@@ -1,6 +1,4 @@
 class Character
-  attr_reader :attack, :speed
-  attr_accessor :defense
 
   def initialize
     @attack = 1

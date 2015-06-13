@@ -6,17 +6,9 @@ class RubyRumble
 
   def initialize
     @length = 30
-    knight = Knight.new
-    mage = Mage.new
-    ranger = Ranger.new
-    characters = [knight, mage, ranger].shuffle
+    # fill me in!
 
-    @players = [{ character: characters.pop,
-                  position: 0,
-                  direction: 'left' },
-                { character: characters.pop,
-                  position: @length - 1,
-                  direction: 'right' }]
+    @players = []
     @players.shuffle!
   end
 
@@ -72,49 +64,31 @@ class RubyRumble
 
   def print_board
     reset_screen!
-    board = Array.new(@length - @players.length) { ' ' }
-
-    @players.each do |player|
-      board.insert player[:position], player[:character].appearance
-    end
+    board = # ?
 
     puts 'Ruby Rumble!!!'
     puts '*' * @length
     remaining_board = @length - @player_name.length - 'Enemy'.length
     puts "#{@player_name}" + ' ' * remaining_board + 'Enemy'
     puts ''
-    puts board.join
+    puts board
   end
 
   def move_characters(player, opponent)
 
-    case player[:direction]
-    when 'left'
-      player[:position] += player[:character].speed
-      player[:position] = opponent[:position] - 1 if player[:position] >= opponent[:position]
-    when 'right'
-      player[:position] -= player[:character].speed
-      player[:position] = opponent[:position] + 1 if player[:position] <= opponent[:position]
-    end
   end
 
   def attack_characters(player, opponent)
 
-    if (player[:position] - opponent[:position]).abs == 1 && player[:character].alive?
-      opponent[:character].defense -= player[:character].attack
-    end
   end
 
   def finished?
     # returns true when one player's characters are all defeated
     # returns false otherwise
-    @players.map { |player| player[:character].alive? }.include? false
   end
 
   def winner
     # returns the name of the winning character
-    winner = @players.find { |player| player[:character].alive? }
-    winner[:character].class
   end
 
   def reset_screen!
