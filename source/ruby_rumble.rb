@@ -100,7 +100,7 @@ class RubyRumble
 
   def attack_characters(player, opponent)
 
-    if (player[:position] - opponent[:position]).abs == 1
+    if (player[:position] - opponent[:position]).abs == 1 && player[:character].alive?
       opponent[:character].defense -= player[:character].attack
     end
   end
